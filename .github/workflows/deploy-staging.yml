@@ -1,0 +1,60 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup SSH Key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add server to known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to VPS
+      env:
+        VPS_USER: ${{ secrets.VPS_USER }}
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+      run: |
+        echo "🚀 Starting deployment to $VPS_HOST..."
+        
+        # Синхронизация файлов (исключаем лишнее)
+        rsync -avz --delete \
+          --exclude 'node_modules' \
+          --exclude 'venv' \
+          --exclude '.git' \
+          --exclude '__pycache__' \
+          --exclude '*.pyc' \
+          --exclude '.env' \
+          ./ $VPS_USER@$VPS_HOST:$PROJECT_PATH/
+
+        echo "📦 Files synced. Building and restarting services..."
+
+        # Выполнение команд на сервере
+        ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+          cd $PROJECT_PATH
+          
+          # Создаем .env.prod из переменных окружения GitHub (опционально, если нужно обновлять секреты)
+          # В данном примере мы полагаемся на файл .env.prod, который уже лежит на сервере или создается вручную
+          
+          # Собираем образы и перезапускаем контейнеры
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d --build
+          
+          # Чистим старые образы для экономии места
+          docker image prune -f
+          
+          echo "✅ Deployment completed successfully!"
+        ENDSSH

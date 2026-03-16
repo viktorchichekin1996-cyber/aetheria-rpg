@@ -1,0 +1,90 @@
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: aetheria-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - aetheria-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: aetheria-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - aetheria-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aetheria-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_URL: redis://redis:6379/0
+      INFERENCE_API_KEY: ${INFERENCE_API_KEY}
+      INFERENCE_API_BASE_URL: ${INFERENCE_API_BASE_URL}
+      INFERENCE_MODEL: ${INFERENCE_MODEL}
+      VK_APP_ID: ${VK_APP_ID}
+      VK_CLIENT_SECRET: ${VK_CLIENT_SECRET}
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aetheria-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aetheria-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - aetheria-network
+
+networks:
+  aetheria-network:
+    driver: bridge
+
+volumes:
+  postgres_:
