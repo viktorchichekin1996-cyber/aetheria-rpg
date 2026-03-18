@@ -96,5 +96,3 @@ docker-compose.override.yml
 # ==========================================
 project_structure.md
 project_to_md.py
-*.tar
-backend-image.tar
