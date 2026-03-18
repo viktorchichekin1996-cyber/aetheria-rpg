@@ -73,3 +73,6 @@ docker-compose.override.yml
 
 # IDE specific
 *.iml
+**/.env
+**/.env.*
+!/.env.example
