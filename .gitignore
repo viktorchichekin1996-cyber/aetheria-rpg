@@ -76,3 +76,6 @@ docker-compose.override.yml
 **/.env
 **/.env.*
 !/.env.example
+
+project_structure.md
+project_to_md.py
