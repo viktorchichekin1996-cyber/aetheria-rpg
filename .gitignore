@@ -1,4 +1,6 @@
-# Python
+# ==========================================
+# PYTHON
+# ==========================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -25,25 +27,35 @@ MANIFEST
 venv/
 ENV/
 env/
-.venv
+.venv/
 
-# IDE
+# ==========================================
+# IDE & EDITORS
+# ==========================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+*.iml
 
-# Environment variables
+# ==========================================
+# ENVIRONMENT VARIABLES (CRITICAL)
+# Игнорируем все .env файлы везде, кроме .env.example
+# ==========================================
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
+# ==========================================
 # OS
+# ==========================================
 .DS_Store
 Thumbs.db
 
-# Node.js
+# ==========================================
+# NODE.JS & REACT
+# ==========================================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -54,31 +66,35 @@ yarn-error.log*
 build/
 .frontend-build/
 
-# Testing
+# ==========================================
+# TESTING
+# ==========================================
 .coverage
 htmlcov/
 .pytest_cache/
 .tox/
 
-# Database
+# ==========================================
+# DATABASE
+# ==========================================
 *.db
 *.sqlite3
 
-# Logs
+# ==========================================
+# LOGS
+# ==========================================
 *.log
 logs/
 
-# Docker
+# ==========================================
+# DOCKER
+# ==========================================
 docker-compose.override.yml
 
-# IDE specific
-*.iml
-**/.env
-**/.env.*
-!/.env.example
-
+# ==========================================
+# PROJECT SPECIFIC (DUMPS & IMAGES)
+# ==========================================
 project_structure.md
 project_to_md.py
-
 *.tar
 backend-image.tar
