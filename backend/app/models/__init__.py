@@ -1,3 +1,4 @@
+# backend/app/models/__init__.py
 from app.models.users import User
 from app.models.items import Item, UserItem
 from app.models.combats import Combat
