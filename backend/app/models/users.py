@@ -1,21 +1,8 @@
 # backend/app/models/users.py
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, func, Text
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.types import JSON
+from sqlalchemy.types import JSON  # Используем универсальный JSON вместо JSONB
 from app.database import Base
 import os
-
-# Определяем тип данных JSON динамически:
-# Если используем PostgreSQL (в переменной DATABASE_URL есть 'postgresql'), используем JSONB.
-# Иначе (для тестов на SQLite) используем стандартный JSON.
-def get_json_type():
-    db_url = os.getenv("DATABASE_URL", "")
-    if "postgresql" in db_url:
-        return JSONB
-    return JSON
-
-JSONType = get_json_type()
-
 
 class User(Base):
     __tablename__ = "users"
@@ -37,7 +24,7 @@ class User(Base):
     spirit = Column(Integer, default=10)
     vitality = Column(Integer, default=10)
     
-    # Производные ресурсы (Derived Stats) - могут пересчитываться
+    # Производные ресурсы (Derived Stats)
     hp = Column(Integer, default=150)
     max_hp = Column(Integer, default=150)
     mana = Column(Integer, default=50)
@@ -48,14 +35,15 @@ class User(Base):
     # Система выносливости
     stamina_last_regen = Column(TIMESTAMP, default=func.now())
     fatigue_state = Column(String(20), default='fit')
-    # Используем универсальный тип JSON/JSONB
-    fatigue_penalty = Column(JSONType, default={}) 
-    stamina_warnings_sent = Column(JSONType, default=[])
+    
+    # ИСПРАВЛЕНО: Используем JSON вместо JSONB для совместимости с SQLite в тестах
+    fatigue_penalty = Column(JSON, default={}) 
+    stamina_warnings_sent = Column(JSON, default=[])
     
     # Экономика и состояние
     gold = Column(Integer, default=0)
     location = Column(String(50), default='village', index=True)
-    story_context = Column(JSONType, default=[])
+    story_context = Column(JSON, default=[])
     
     # Боевой статус
     in_combat = Column(Boolean, default=False, index=True)
@@ -63,9 +51,9 @@ class User(Base):
     
     # Инвентарь и экипировка
     inventory_slots = Column(Integer, default=20)
-    equipment = Column(JSONType, default={})
-    active_buffs = Column(JSONType, default=[])
-    active_debuffs = Column(JSONType, default=[])
+    equipment = Column(JSON, default={})
+    active_buffs = Column(JSON, default=[])
+    active_debuffs = Column(JSON, default=[])
     
     # Мета-данные
     created_at = Column(TIMESTAMP, default=func.now())
@@ -74,17 +62,8 @@ class User(Base):
     @staticmethod
     def get_stat_modifier(stat_value: int) -> int:
         """
-        Рассчитывает модификатор характеристики по таблице из ТЗ:
-        1-3: -4
-        4-5: -3
-        6-7: -2
-        8-9: -1
-        10-11: 0
-        12-13: +1
-        ...
-        
-        Стандартная формула (stat - 10) // 2 дает для 1 значение -5, 
-        поэтому добавляем корректировку для единицы согласно ТЗ.
+        Рассчитывает модификатор характеристики.
+        1-3: -4, 4-5: -3, ..., 10-11: 0, 12-13: +1
         """
         if stat_value == 1:
             return -4

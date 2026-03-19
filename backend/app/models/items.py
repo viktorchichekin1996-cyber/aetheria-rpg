@@ -1,19 +1,7 @@
 # backend/app/models/items.py
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, ForeignKey, func, Text
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.types import JSON
+from sqlalchemy.types import JSON  # Используем универсальный JSON
 from app.database import Base
-import os
-
-# Определяем тип данных JSON динамически (аналогично users.py)
-def get_json_type():
-    db_url = os.getenv("DATABASE_URL", "")
-    if "postgresql" in db_url:
-        return JSONB
-    return JSON
-
-JSONType = get_json_type()
-
 
 class Item(Base):
     __tablename__ = "items"
@@ -25,8 +13,8 @@ class Item(Base):
     rarity = Column(String(20), default='common')
     slot = Column(String(50), nullable=True)
     
-    # Используем универсальный тип
-    stats = Column(JSONType, default={})
+    # ИСПРАВЛЕНО: JSON вместо JSONB
+    stats = Column(JSON, default={})
     
     min_level = Column(Integer, default=1)
     durability = Column(Integer, default=100)
@@ -34,8 +22,8 @@ class Item(Base):
     value = Column(Integer, default=0)
     buy_price = Column(Integer, default=0)
     
-    # Используем универсальный тип
-    effects = Column(JSONType, default=[])
+    # ИСПРАВЛЕНО: JSON вместо JSONB
+    effects = Column(JSON, default=[])
     
     soulbound = Column(Boolean, default=False)
     tradeable = Column(Boolean, default=True)
@@ -52,8 +40,8 @@ class UserItem(Base):
     quantity = Column(Integer, default=1)
     equipped = Column(Boolean, default=False)
     
-    # Используем универсальный тип
-    bonus_stats = Column(JSONType, default={})
+    # ИСПРАВЛЕНО: JSON вместо JSONB
+    bonus_stats = Column(JSON, default={})
     
     enchantment_level = Column(Integer, default=0)
     acquired_at = Column(TIMESTAMP, default=func.now())
