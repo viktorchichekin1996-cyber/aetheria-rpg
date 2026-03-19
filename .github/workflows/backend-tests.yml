@@ -43,7 +43,6 @@ jobs:
       with:
         python-version: '3.10'
     
-    # Установка зависимостей внутри папки backend
     - name: Install dependencies
       working-directory: ./backend
       run: |
@@ -59,15 +58,34 @@ jobs:
     - name: Run Tests
       working-directory: ./backend
       env:
-        DATABASE_URL: postgresql://rpg_user:secure_password_test@localhost:5432/aetheria_rpg_test
-        REDIS_HOST: localhost
-        REDIS_PORT: 6379
-        SECRET_KEY: test-secret-key-ci
-        INFERENCE_API_KEY: test-key
-        INFERENCE_API_BASE_URL: http://test-url
-        VK_APP_ID: test-id
-        VK_CLIENT_SECRET: test-secret
-        DEBUG: True
+        # Переменные окружения для тестов
+        DEBUG: "True"
+        SECRET_KEY: "test-secret-key-ci"
+        
+        # База данных (должны совпадать с сервисом postgres выше)
+        DATABASE_URL: "postgresql://rpg_user:secure_password_test@localhost:5432/aetheria_rpg_test"
+        POSTGRES_USER: "rpg_user"
+        POSTGRES_PASSWORD: "secure_password_test"
+        POSTGRES_DB: "aetheria_rpg_test"
+        POSTGRES_HOST: "localhost"
+        POSTGRES_PORT: "5432"
+        
+        # Redis
+        REDIS_HOST: "localhost"
+        REDIS_PORT: "6379"
+        REDIS_URL: "redis://localhost:6379/0"
+        
+        # AI (Inference)
+        INFERENCE_API_KEY: "test-key"
+        INFERENCE_API_BASE_URL: "http://test-url"
+        INFERENCE_MODEL: "google/gemma-3-27b-instruct"
+        
+        # VK
+        VK_APP_ID: "test-id"
+        VK_CLIENT_SECRET: "test-secret"
+        
+        # CORS
+        ALLOWED_ORIGINS: "http://localhost:3000"
       run: |
         if [ -d "tests" ] && [ "$(ls -A tests)" ]; then
           pytest tests/ -v
