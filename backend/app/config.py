@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Aetheria RPG"
     DEBUG: bool = False
-    SECRET_KEY: str = "dev-secret-key-change-in-prod" # Ключ для подписи JWT
+    SECRET_KEY: str = "dev-secret-key-change-in-prod"
     API_V1_PREFIX: str = "/api/v1"
     
     # Database
@@ -36,11 +36,12 @@ class Settings(BaseSettings):
     
     # VK Mini Apps
     VK_APP_ID: str
-    VK_CLIENT_SECRET: str # Секретный ключ приложения из настроек ВК
+    VK_CLIENT_SECRET: str
     
     # Security & Auth
+    JWT_SECRET_KEY: str = "dev-jwt-secret-key-change-in-prod"  # <-- ДОБАВЛЕНО ЭТО ПОЛЕ
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440 # 24 часа
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     
     # CORS
     ALLOWED_ORIGINS: str = "https://vk.com,https://m.vk.com,http://localhost:3000"
@@ -50,7 +51,10 @@ class Settings(BaseSettings):
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
     
     class Config:
-        env_file = ".env.dev"
+        env_file = ".env.dev"  # Или ".env", в зависимости от того, какой файл вы используете локально
         case_sensitive = True
+        extra = "ignore"  # <-- ИГНОРИРОВАТЬ ЛИШНИЕ ПЕРЕМЕННЫЕ (безопасный вариант)
 
+
+# Глобальный экземпляр настроек
 settings = Settings()

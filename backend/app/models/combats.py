@@ -1,6 +1,18 @@
-from sqlalchemy import Column, Integer, Boolean, TIMESTAMP, func
+# backend/app/models/combats.py
+from sqlalchemy import Column, Integer, Boolean, TIMESTAMP, func, Text
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.types import JSON
 from app.database import Base
+import os
+
+# Определяем тип данных JSON динамически
+def get_json_type():
+    db_url = os.getenv("DATABASE_URL", "")
+    if "postgresql" in db_url:
+        return JSONB
+    return JSON
+
+JSONType = get_json_type()
 
 
 class Combat(Base):
@@ -12,7 +24,10 @@ class Combat(Base):
     player1_hp = Column(Integer, default=100)
     player2_hp = Column(Integer, default=100)
     turn = Column(Integer, default=1)
-    log = Column(JSONB, default=[])
+    
+    # Используем универсальный тип для лога боя
+    log = Column(JSONType, default=[])
+    
     winner_id = Column(Integer, nullable=True)
     is_active = Column(Boolean, default=True, index=True)
     created_at = Column(TIMESTAMP, default=func.now())

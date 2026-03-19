@@ -1,11 +1,13 @@
 # backend/app/main.py
 # ... импорты ...
+
 from fastapi import FastAPI, Request, status, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from datetime import datetime
+from app.api import player
 
 from .config import settings
 from .database import engine, Base, get_db
@@ -81,6 +83,8 @@ async def get_me(current_user: User = Depends(get_current_user)):
         "level": current_user.level,
         "class": current_user.character_class
     }
+
+app.include_router(player.router, prefix=settings.API_V1_PREFIX)
 
 if __name__ == "__main__":
     import uvicorn
