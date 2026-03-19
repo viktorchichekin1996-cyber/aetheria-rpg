@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Aetheria RPG"
     DEBUG: bool = False
-    SECRET_KEY: str = "dev-secret-key-change-in-prod"
+    SECRET_KEY: str = "dev-secret-key-change-in-prod" # Ключ для подписи JWT
     API_V1_PREFIX: str = "/api/v1"
     
     # Database
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
     
-    # AI (Inference API) - Важно: модель обновлена
+    # AI (Inference API)
     INFERENCE_API_KEY: str
     INFERENCE_API_BASE_URL: str = "https://api.inference.net/v1"
     INFERENCE_MODEL: str = "google/gemma-3-27b-instruct"
@@ -36,25 +36,21 @@ class Settings(BaseSettings):
     
     # VK Mini Apps
     VK_APP_ID: str
-    VK_CLIENT_SECRET: str
+    VK_CLIENT_SECRET: str # Секретный ключ приложения из настроек ВК
     
-    # Security
-    JWT_SECRET_KEY: str = "dev-jwt-secret"
+    # Security & Auth
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440 # 24 часа
     
-    # CORS: Добавляем домены VK для Mini Apps
+    # CORS
     ALLOWED_ORIGINS: str = "https://vk.com,https://m.vk.com,http://localhost:3000"
     
     @property
     def allowed_origins_list(self) -> List[str]:
-        """Парсит строку origins в список"""
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
     
     class Config:
-        env_file = ".env.dev"  # По умолчанию dev окружение
+        env_file = ".env.dev"
         case_sensitive = True
 
-
-# Глобальный экземпляр настроек
 settings = Settings()
