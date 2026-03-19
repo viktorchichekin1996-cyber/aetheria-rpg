@@ -43,17 +43,14 @@ jobs:
       with:
         python-version: '3.10'
     
-    # ВАЖНО: Все последующие шаги выполняются внутри папки backend
+    # Установка зависимостей внутри папки backend
     - name: Install dependencies
       working-directory: ./backend
       run: |
         python -m pip install --upgrade pip
-        # Устанавливаем зависимости проекта
         pip install -r requirements.txt
-        # Устанавливаем линтеры и тестовые фреймворки
         pip install flake8 black pytest pytest-asyncio httpx
-        # Явно устанавливаем текущий проект как пакет (editable mode), чтобы импорты работали надежнее
-        pip install -e .
+    
     - name: Run Linter (Flake8)
       working-directory: ./backend
       run: |
@@ -77,4 +74,3 @@ jobs:
         else
           echo "No tests found yet. Skipping pytest."
         fi
-        
