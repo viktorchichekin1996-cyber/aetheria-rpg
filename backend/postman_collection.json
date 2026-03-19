@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Aetheria RPG API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Player",
+      "item": [
+        {
+          "name": "Get Player",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/{{vk_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["player", "{{vk_id}}"],
+              "variable": [
+                {
+                  "key": "vk_id",
+                  "value": "12345"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Player Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/{{vk_id}}/stats",
+              "host": ["{{base_url}}"],
+              "path": ["player", "{{vk_id}}", "stats"],
+              "variable": [
+                {
+                  "key": "vk_id",
+                  "value": "12345"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/../health",
+          "host": ["{{base_url}}"],
+          "path": ["..", "health"]
+        }
+      }
+    }
+  ]
+}
