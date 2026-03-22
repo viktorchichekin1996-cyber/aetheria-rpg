@@ -55,7 +55,7 @@ const AppContent: React.FC = () => {
    * Авто-скрытие уведомлений по таймеру
    */
   useEffect(() => {
-    const timers = notifications.map(notification => {
+    const timers = notifications.map((notification) => {
       if (notification.duration) {
         return setTimeout(() => {
           dispatch(removeNotification(notification.id));
@@ -65,7 +65,7 @@ const AppContent: React.FC = () => {
     });
 
     return () => {
-      timers.forEach(timer => timer && clearTimeout(timer));
+      timers.forEach((timer) => timer && clearTimeout(timer));
     };
   }, [notifications, dispatch]);
 

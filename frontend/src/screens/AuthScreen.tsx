@@ -24,7 +24,6 @@ const AuthScreen: React.FC = () => {
   
   // Получаем состояние из Redux
   const { vkBridgeReady, loading } = useSelector((state: RootState) => state.game.ui);
-  const player = useSelector((state: RootState) => state.game.player);
 
   /**
    * Инициализация VK Bridge при монтировании компонента
