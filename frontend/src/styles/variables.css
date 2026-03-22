@@ -1,0 +1,128 @@
+/* frontend/src/styles/variables.css */
+
+:root {
+  /* === COLORS === */
+  /* Primary */
+  --color-primary: #5c6bc0;
+  --color-primary-dark: #3f51b5;
+  --color-primary-light: #9fa8da;
+  
+  /* Secondary */
+  --color-secondary: #26a69a;
+  --color-secondary-dark: #00897b;
+  --color-secondary-light: #64d8cb;
+  
+  /* Status */
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-error: #f44336;
+  --color-info: #2196f3;
+  
+  /* Neutral */
+  --color-background: #1a1a2e;
+  --color-surface: #16213e;
+  --color-surface-elevated: #0f3460;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0c0;
+  --color-text-disabled: #666688;
+  --color-border: #3a3a5a;
+  --color-border-light: #2a2a4a;
+  
+  /* === STAMINA COLORS === */
+  --stamina-fit: #4caf50;
+  --stamina-tired: #ff9800;
+  --stamina-exhausted: #f44336;
+  
+  /* === RARITY COLORS === */
+  --rarity-common: #95a5a6;
+  --rarity-uncommon: #2ecc71;
+  --rarity-rare: #3498db;
+  --rarity-epic: #9b59b6;
+  --rarity-legendary: #e67e22;
+  --rarity-unique: #e74c3c;
+  
+  /* === TYPOGRAPHY === */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+                      'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'Fira Code', 'Courier New', monospace;
+  
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+  --font-size-2xl: 2rem;      /* 32px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* === SPACING === */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-5: 1.25rem;   /* 20px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-10: 2.5rem;   /* 40px */
+  --spacing-12: 3rem;     /* 48px */
+  
+  /* === BORDER RADIUS === */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+  
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(92, 107, 192, 0.5);
+  
+  /* === TRANSITIONS === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+  
+  /* === Z-INDEX === */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-overlay: 500;
+  
+  /* === STAMINA BAR === */
+  --stamina-bar-height: 8px;
+  --stamina-bar-radius: 4px;
+  
+  /* === HEALTH BAR === */
+  --health-bar-height: 12px;
+  --health-bar-radius: 6px;
+}
+
+/* Dark mode adjustments (VK Mini Apps are dark by default) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-background: #f5f5f7;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #f9f9fb;
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: #4a4a6a;
+    --color-text-disabled: #9999aa;
+    --color-border: #d0d0e0;
+    --color-border-light: #e0e0f0;
+  }
+}
+
+/* 
+  Примечание: @custom-media удалены для совместимости со стандартным CSS линтером.
+  Используйте стандартные media queries в компонентах при необходимости.
+  Пример:
+  @media (max-width: 767px) { ... }
+*/
