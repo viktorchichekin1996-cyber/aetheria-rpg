@@ -1,7 +1,9 @@
 // frontend/src/services/vkBridge.ts
 import vkBridge from '@vkontakte/vk-bridge';
 
-// Типы для данных пользователя (упрощённые для совместимости)
+/**
+ * Интерфейс для данных пользователя VK
+ */
 export interface VKUserInfo {
   id: number;
   first_name: string;
@@ -13,11 +15,10 @@ export interface VKUserInfo {
   };
 }
 
-// Тип для результата инициализации
-export interface VKInitResult {
-  result: true;
-}
-
+/**
+ * Сервис для работы с VK Bridge
+ * Реализует паттерн Singleton для единственного инстанса
+ */
 export class VKBridgeService {
   private static instance: VKBridgeService;
   private initialized = false;
@@ -25,6 +26,9 @@ export class VKBridgeService {
 
   private constructor() {}
 
+  /**
+   * Получение единственного инстанса сервиса
+   */
   static getInstance(): VKBridgeService {
     if (!VKBridgeService.instance) {
       VKBridgeService.instance = new VKBridgeService();
@@ -34,6 +38,7 @@ export class VKBridgeService {
 
   /**
    * Инициализация VK Bridge
+   * Должна вызываться один раз при старте приложения
    */
   async init(): Promise<boolean> {
     try {
@@ -48,11 +53,17 @@ export class VKBridgeService {
   }
 
   /**
-   * Получение информации о пользователе
+   * Получение информации о пользователе VK
+   * Кэширует данные после первого получения
    */
   async getUserInfo(): Promise<VKUserInfo | null> {
     if (!this.initialized) {
       await this.init();
+    }
+
+    // Возвращаем кэшированные данные если есть
+    if (this.userInfo) {
+      return this.userInfo;
     }
 
     try {
@@ -66,11 +77,10 @@ export class VKBridgeService {
   }
 
   /**
-   * Показ системного уведомления (упрощённая версия)
+   * Показ системного уведомления VK
    */
   async showSnackbar(message: string): Promise<void> {
     try {
-      // Используем любой для обхода строгой типизации VK Bridge
       await (vkBridge as any).send('VKWebAppShowSnackbar', {
         message,
         duration: 3,
@@ -81,7 +91,7 @@ export class VKBridgeService {
   }
 
   /**
-   * Проверка доступности метода
+   * Проверка поддержки метода VK Bridge
    */
   supports(method: string): boolean {
     const supportedMethods = [
@@ -95,7 +105,7 @@ export class VKBridgeService {
   }
 
   /**
-   * Отправка произвольного запроса
+   * Отправка произвольного запроса к VK Bridge
    */
   async send<T = any>(method: string, params?: Record<string, any>): Promise<T> {
     if (!this.initialized) {
@@ -104,12 +114,25 @@ export class VKBridgeService {
     return vkBridge.send(method as any, params) as Promise<T>;
   }
 
+  /**
+   * Проверка статуса инициализации
+   */
   isInitialized(): boolean {
     return this.initialized;
   }
 
+  /**
+   * Получение кэшированной информации о пользователе
+   */
   getUserInfoCached(): VKUserInfo | null {
     return this.userInfo;
+  }
+
+  /**
+   * Сброс кэша пользователя (для logout)
+   */
+  clearUserInfo(): void {
+    this.userInfo = null;
   }
 }
 

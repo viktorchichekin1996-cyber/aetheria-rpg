@@ -36,8 +36,11 @@
 .loading-overlay__message {
   color: var(--color-text-secondary);
   margin: 0;
+  font-size: var(--font-size-base);
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

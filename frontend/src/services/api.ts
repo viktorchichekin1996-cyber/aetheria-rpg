@@ -11,6 +11,10 @@ import { addNotification, setLoading, setError } from '../store/gameSlice';
 // Базовый URL API
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
+/**
+ * API клиент для взаимодействия с backend
+ * Настраивает interceptors для авторизации и обработки ошибок
+ */
 class ApiClient {
   private client: AxiosInstance;
 
@@ -26,6 +30,9 @@ class ApiClient {
     this.setupInterceptors();
   }
 
+  /**
+   * Настройка interceptors для запросов и ответов
+   */
   private setupInterceptors(): void {
     // Request interceptor - добавляем auth токены
     this.client.interceptors.request.use(
@@ -36,8 +43,6 @@ class ApiClient {
         if (vkId) {
           config.headers = config.headers || {};
           config.headers['Authorization'] = `Bearer ${vkId}`;
-          // В продакшене здесь будет VK sign
-          // config.headers['X-VK-Sign'] = generateVKSign(...);
         }
         return config;
       },
@@ -53,7 +58,8 @@ class ApiClient {
       (error) => {
         store.dispatch(setLoading(false));
 
-        const message = error.response?.data?.error?.message || 
+        const message = error.response?.data?.detail || 
+                       error.response?.data?.error?.message || 
                        error.message || 
                        'Произошла ошибка';
 
@@ -64,7 +70,6 @@ class ApiClient {
         }));
 
         if (error.response?.status === 401) {
-          // Unauthorized - возможно нужно перелогиниться
           console.warn('Unauthorized, redirect to auth...');
         }
 
@@ -74,6 +79,10 @@ class ApiClient {
   }
 
   // === AUTH ===
+  /**
+   * Авторизация через VK
+   * Отправляет данные пользователя на backend для создания/обновления аккаунта
+   */
   async vkLogin(params: {
     vk_id: number;
     first_name: string;
@@ -118,82 +127,6 @@ class ApiClient {
 
   async selectClass(classId: string) {
     return this.client.post('/classes/select', { class_id: classId });
-  }
-
-  // === ACTIONS ===
-  async rollDice() {
-    return this.client.post('/roll');
-  }
-
-  async performAction(action: string, target?: string) {
-    return this.client.post('/action', { action, target });
-  }
-
-  // === INVENTORY ===
-  async getInventory(vkId: number) {
-    return this.client.get(`/inventory/${vkId}`);
-  }
-
-  async useItem(itemId: number, action: string) {
-    return this.client.post('/inventory/action', {
-      item_id: itemId,
-      action,
-    });
-  }
-
-  async equipItem(itemId: number, slot: string) {
-    return this.client.post('/inventory/action', {
-      item_id: itemId,
-      action: 'equip',
-      slot,
-    });
-  }
-
-  // === COMBAT ===
-  async startCombat() {
-    return this.client.post('/combat/start');
-  }
-
-  async combatAction(action: string, target?: string) {
-    return this.client.post('/combat/action', { action, target });
-  }
-
-  async getCombat(combatId: number) {
-    return this.client.get(`/combat/${combatId}`);
-  }
-
-  // === STAMINA ===
-  async getStamina(vkId: number) {
-    return this.client.get(`/stamina/${vkId}`);
-  }
-
-  async rest(restType: 'spot' | 'camp' | 'tavern') {
-    return this.client.post('/rest', { rest_type: restType });
-  }
-
-  // === SHOP ===
-  async getShop() {
-    return this.client.get('/shop');
-  }
-
-  async buyItem(itemId: number, quantity: number = 1) {
-    return this.client.post('/shop/buy', {
-      item_id: itemId,
-      quantity,
-    });
-  }
-
-  // === PvP ===
-  async joinPvPQueue() {
-    return this.client.post('/pvp/queue');
-  }
-
-  async leavePvPQueue() {
-    return this.client.delete('/pvp/queue');
-  }
-
-  async getPvPRating() {
-    return this.client.get('/pvp/rating');
   }
 
   // === Утилиты ===

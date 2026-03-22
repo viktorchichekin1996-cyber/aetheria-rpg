@@ -3,80 +3,94 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Provider } from 'react-redux';
 import { store, RootState } from './store';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './routes';
 import { vkBridgeService } from './services/vkBridge';
-import { setVkBridgeReady, setPlayerData, addNotification, removeNotification } from './store/gameSlice';
+import {
+  setVkBridgeReady,
+  setPlayerData,
+  addNotification,
+  removeNotification,
+} from './store/gameSlice';
 
-// Components - заглушки для текущего блока
-const LoadingOverlay = ({ visible }: { visible: boolean }) => {
-  if (!visible) return null;
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.7)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999
-    }}>
-      <div style={{ color: '#fff', fontSize: '16px' }}>Загрузка...</div>
-    </div>
-  );
-};
+// Components
+import NotificationContainer from './components/NotificationContainer';
+import LoadingOverlay from './components/LoadingOverlay';
 
-const NotificationContainer = ({ notifications }: { notifications: any[] }) => {
-  return (
-    <div style={{
-      position: 'fixed',
-      top: '16px',
-      right: '16px',
-      zIndex: 1000
-    }}>
-      {notifications.map((n) => (
-        <div key={n.id} style={{
-          padding: '12px 16px',
-          marginBottom: '8px',
-          borderRadius: '8px',
-          background: n.type === 'error' ? '#e74c3c' : '#3498db',
-          color: '#fff'
-        }}>
-          {n.message}
-        </div>
-      ))}
-    </div>
-  );
-};
-
+/**
+ * Основной контент приложения с роутингом
+ */
 const AppContent: React.FC = () => {
   const dispatch = useDispatch();
-  const { vkBridgeReady, loading, notifications } = useSelector(
+  const { vkBridgeReady, notifications, loading } = useSelector(
     (state: RootState) => state.game.ui
   );
+  const player = useSelector((state: RootState) => state.game.player);
 
+  /**
+   * Инициализация VK Bridge при монтировании
+   */
   useEffect(() => {
     const initVK = async () => {
       const success = await vkBridgeService.init();
       dispatch(setVkBridgeReady(success));
+
+      if (success) {
+        // Пробуем получить информацию о пользователе
+        const userInfo = await vkBridgeService.getUserInfo();
+        if (userInfo) {
+          dispatch(setPlayerData({
+            vkId: userInfo.id,
+            username: `${userInfo.first_name} ${userInfo.last_name}`.trim(),
+            avatar: userInfo.photo_200 || '',
+          }));
+        }
+      }
     };
+
     initVK();
   }, [dispatch]);
 
+  /**
+   * Авто-скрытие уведомлений по таймеру
+   */
+  useEffect(() => {
+    const timers = notifications.map(notification => {
+      if (notification.duration) {
+        return setTimeout(() => {
+          dispatch(removeNotification(notification.id));
+        }, notification.duration);
+      }
+      return null;
+    });
+
+    return () => {
+      timers.forEach(timer => timer && clearTimeout(timer));
+    };
+  }, [notifications, dispatch]);
+
+  /**
+   * Синхронизация данных игрока при изменении vkId
+   */
+  useEffect(() => {
+    if (player.vkId && vkBridgeReady) {
+      // Здесь можно добавить загрузку данных игрока с backend
+      console.log('Player vkId:', player.vkId);
+    }
+  }, [player.vkId, vkBridgeReady, dispatch]);
+
   return (
     <div className="app">
-      <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-        <h1>🏰 Королевства Этерии</h1>
-        <p>Статус: {vkBridgeReady ? 'VK Bridge готов' : 'Инициализация...'}</p>
-        <p>Backend: <code>http://localhost:8000</code></p>
-      </div>
+      <RouterProvider router={router} />
       <NotificationContainer notifications={notifications} />
       <LoadingOverlay visible={loading} />
     </div>
   );
 };
 
+/**
+ * Корневой компонент приложения с Redux Provider
+ */
 const App: React.FC = () => {
   return (
     <Provider store={store}>
