@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Provider } from 'react-redux';
 import { store, RootState } from './store';
 import { vkBridgeService } from './services/vkBridge';
-import { setVkBridgeReady, setPlayerData } from './store/gameSlice';
+import { setVkBridgeReady, setPlayerData, addNotification, removeNotification } from './store/gameSlice';
 
 // Components - заглушки для текущего блока
 const LoadingOverlay = ({ visible }: { visible: boolean }) => {
